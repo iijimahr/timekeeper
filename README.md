@@ -1,9 +1,10 @@
 # Time Keeper
+**This repository is a fork of [maruta/timekeeper](https://github.com/maruta/timekeeper).**
 HTML5 and JavaScript based timer with notification chime for academic conference.
 
 ### How to Use?
 Access
-https://maruta.github.io/timekeeper/  
+https://iijimahr.github.io/timekeeper
 or you can use local copy of this repository.
 
 **:bangbang: Be careful to turn off screen savers and automatic screen cut :bangbang:**
