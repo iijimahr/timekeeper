@@ -1,7 +1,12 @@
 {
+    "id": "./",
     "name": "Time Keeper",
     "short_name": "TimeKeeper",
+    "description": "An easy-to-use timer designed for academic conferences.",
+    "start_url": "./",
+    "scope": "./",
     "theme_color": "#000",
+    "background_color": "#000000",
     "display": "fullscreen",
     "orientation": "landscape-primary",
     "icons": [

@@ -8,7 +8,32 @@ Access
 https://iijimahr.github.io/timekeeper
 or you can use local copy of this repository.
 
-**:bangbang: Be careful to turn off screen savers and automatic screen cut :bangbang:**
+Time Keeper keeps the screen awake while the timer is running
+(via the Screen Wake Lock API). On browsers without that API, be careful to
+turn off screen savers and automatic screen cut yourself.
+
+### Offline Use (Install as an App)
+
+Time Keeper is a PWA and works with no network connection once it has been
+loaded on the device.
+
+**iOS / iPadOS**
+
+ 1. Open https://iijimahr.github.io/timekeeper in Safari and wait a moment for
+    the assets to be cached.
+ 2. Share :arrow_up: → **Add to Home Screen**.
+ 3. Launch it from the home screen icon. It works in airplane mode.
+
+**Android / Desktop Chrome**
+
+Use the install button in the address bar, or just visit the page once — the
+service worker caches everything either way.
+
+**:bangbang: On iPhone/iPad, the chime is silenced by the ring/silent switch.
+Turn silent mode off before your session. :bangbang:**
+
+Note that the app always starts with the default times. To use custom settings,
+open your bookmarked URL (see below) rather than the home screen icon.
 
 ### How to Save the Settings?
 All current settings are included in URL.
@@ -37,6 +62,14 @@ Time Keeper logo on left-top is the link to the URL with the current setting, an
  * When you switch to a scene that contains the magic keywords `:standby`, `:start`, and `:pause` in the scene name, the corresponding button will be pressed.
 
 https://user-images.githubusercontent.com/486675/118618497-a43d7780-b7fe-11eb-8662-587abeeae9ab.mp4
+
+### Maintenance Note
+
+Offline support is provided by `sw.js`, which precaches every asset listed in
+its `PRECACHE_URLS`. **When you add, remove, or modify any of those assets, bump
+`CACHE_NAME` in `sw.js`** — otherwise installed clients keep serving the old
+copies indefinitely. Updates take effect the next time the app is launched, not
+mid-session, so a running timer is never reloaded out from under you.
 
 ### License
 Timekeeper is open-sourced software licensed under The MIT License.

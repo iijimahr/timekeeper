@@ -107,6 +107,63 @@ $(function () {
 	audio_chime2 = new Audio("./wav/chime2.mp3");
 	audio_chime3 = new Audio("./wav/chime3.mp3");
 
+	// iOS refuses to play audio later on unless play() was called once during a
+	// user gesture. Do a silent play/pause on the first interaction to unlock.
+	var audio_unlocked = false;
+	function unlock_audio() {
+		if (audio_unlocked) {
+			return;
+		}
+		audio_unlocked = true;
+		[audio_chime1, audio_chime2, audio_chime3].forEach(function (a) {
+			a.muted = true;
+			var p = a.play();
+			if (p && p.then) {
+				p.then(function () {
+					a.pause();
+					a.currentTime = 0;
+					a.muted = false;
+				}).catch(function () {
+					a.muted = false;
+				});
+			} else {
+				a.muted = false;
+			}
+		});
+	}
+	$(document).on('click touchend', unlock_audio);
+
+	// Keep the screen awake while the timer is running. No-op where the Screen
+	// Wake Lock API is unavailable (iOS gained it in 16.4).
+	var wake_lock = null;
+	function request_wake_lock() {
+		if (!('wakeLock' in navigator) || wake_lock !== null) {
+			return;
+		}
+		navigator.wakeLock.request('screen').then(function (lock) {
+			wake_lock = lock;
+			lock.addEventListener('release', function () {
+				wake_lock = null;
+			});
+		}).catch(function () {
+			wake_lock = null;
+		});
+	}
+	function release_wake_lock() {
+		if (wake_lock === null) {
+			return;
+		}
+		var lock = wake_lock;
+		wake_lock = null;
+		lock.release().catch(function () { });
+	}
+	// iOS drops the lock when the app goes to the background.
+	$(document).on('visibilitychange', function () {
+		if (document.visibilityState === 'visible' && $('.nav li#start').hasClass('active')) {
+			request_wake_lock();
+		}
+	});
+
 	function changeStateClass(s) {
 		$('body').removeClass(function (index, className) {
 			return (className.match(/\bstate-\S+/g) || []).join(' ');
@@ -129,6 +186,7 @@ $(function () {
 		changePhaseClass('0');
 		time_inner = parse_time($('#time0').val());
 		show_time();
+		release_wake_lock();
 	}
 
 	function start() {
@@ -144,6 +202,7 @@ $(function () {
 		audio_chime1.load();
 		audio_chime2.load();
 		audio_chime3.load();
+		request_wake_lock();
 	}
 
 	$('.nav #standby').click(function (event) {
@@ -182,6 +241,7 @@ $(function () {
 		update_time();
 		$('#state').html('PAUSED');
 		changeStateClass('paused');
+		release_wake_lock();
 	}
 
 	$('.nav #pause').click(function (event) {
